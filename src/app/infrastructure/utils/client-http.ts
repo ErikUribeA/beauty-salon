@@ -15,11 +15,11 @@ export class HttpClient {
             "Content-Type": "application/json",
         };
 
-        // Obtiene la sesión actual para verificar si está autenticado
-        const session = await getServerSession(authOptions);
-        if (session && session.user.token) {
-            headers["Authorization"] = `Bearer ${session.user.token}`;
-        }
+    // Obtiene la sesión actual para verificar si está autenticado
+    const session = await getServerSession(authOptions);
+    if (session && session.user.token) {
+        headers["Authorization"] = `Bearer ${session.user.token}`;
+    }
 
         return headers;
     }
