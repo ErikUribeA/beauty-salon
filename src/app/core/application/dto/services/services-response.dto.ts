@@ -1,5 +1,5 @@
 export interface IServices {
-    content:          Content[];
+    content:          IResponseService[];
     pageable:         Pageable;
     totalPages:       number;
     totalElements:    number;
@@ -19,7 +19,7 @@ export interface IPostService {
 }
 
 
-export interface Content {
+export interface IResponseService {
     id:          number;
     name:        string;
     description: string;

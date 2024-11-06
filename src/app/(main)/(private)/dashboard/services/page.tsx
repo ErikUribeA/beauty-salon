@@ -1,24 +1,38 @@
 import React from 'react'
 import { ServicesService } from '@/app/infrastructure/services/service.service'
-import Link from 'next/link'
+import ContainerS from '@/UI/organims/Container'
+import { PostServiceForm } from '@/UI/organims/newServiceForm'
 
-const useServicesService = new ServicesService
 
-export default async function ServicesPage() {
-    const data = await useServicesService.findAll(1, 10)
+const useServicesService = new ServicesService()
+
+interface IProps {
+    searchParams: {
+        page: string;
+        size: string;
+        name: string;
+    }
+}
+
+export const generateMetadata = async ({ searchParams }: IProps) => {
+    const page = searchParams.page ?? '1'
+    return {
+        title: `Services - Página ${page}`,
+        description: 'Service of beauty-salon'
+    }
+}
+
+export default async function ServicesPage({ searchParams }: IProps) {
+    const page = searchParams.page ? parseInt(searchParams.page) : 1
+    const size = searchParams.size ? parseInt(searchParams.size) : 9
+
+    const data = await useServicesService.findAll(page, size)
 
     return (
-        <div>Data
-            {data.content.map((service) => (
-                <div key={service.id}>
-                    <h1>{service.name}</h1>
-                    <h3> {service.description} </h3>
-                    <h3> {service.price} </h3>
-                </div>
-
-            ))}
-        <Link href="../createService" ></Link>
+        <div className='w-full'>
+            <h1 className='font-bold text-[3em] text-center'>Services</h1>
+            <ContainerS data={data} />
+            <PostServiceForm />
         </div>
-
     )
 }

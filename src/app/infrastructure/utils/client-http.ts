@@ -1,4 +1,4 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions, CustomSession } from "@/app/api/auth/[...nextauth]/route"
 import { getServerSession } from "next-auth/next"
 
 const defaultBaseUrl = "https://beautysalongates-production.up.railway.app/api/v1"
@@ -16,7 +16,7 @@ export class HttpClient {
         };
 
     // Obtiene la sesión actual para verificar si está autenticado
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as CustomSession;
     if (session && session.user.token) {
         headers["Authorization"] = `Bearer ${session.user.token}`;
     }

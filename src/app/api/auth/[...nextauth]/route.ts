@@ -15,11 +15,12 @@ interface AuthUser {
     token: string;
 }
 
-interface CustomSession extends Session {
+export interface CustomSession extends Session {
     user: {
         id?: string;
         token?: string;
         name?: string | null;
+
         email?: string | null;
         image?: string | null;
     };
@@ -35,28 +36,28 @@ export const authOptions: NextAuthOptions = {
             },
             authorize: async (credentials) => {
                 if (!credentials?.password || !credentials.username) {
-                    console.error("Credenciales faltantes")
-                    return null
+                    console.error("Credenciales faltantes");
+                    return null;
                 }
                 const loginRequest: ILoginRequest = {
                     password: credentials.password,
                     userName: credentials.username
-                }
+                };
 
                 try {
-                    const authService = new AuthService()
-                    const response = await authService.login(loginRequest)
+                    const authService = new AuthService();
+                    const response = await authService.login(loginRequest);
 
                     return {
                         email: loginRequest.userName,
                         id: loginRequest.userName,
                         name: loginRequest.userName,
                         token: response.token
-                    } as AuthUser
+                    } as AuthUser;
 
                 } catch (error) {
-                    console.log(error)
-                    return Promise.reject(new Error(JSON.stringify(error)))
+                    console.log(error);
+                    return Promise.reject(new Error(JSON.stringify(error)));
                 }
             },
         }),
@@ -82,6 +83,5 @@ export const authOptions: NextAuthOptions = {
     },
 };
 
-export default NextAuth(authOptions);
 export const GET = NextAuth(authOptions);
 export const POST = NextAuth(authOptions);
