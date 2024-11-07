@@ -20,10 +20,23 @@ export class ServicesService {
 
     async create(service: IPostService) {
         try {
-            const createCompany = this.httpClient.post("sevices", service)
-            return createCompany
+            const response = await fetch(`/api/services/create/services`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(service),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error);
+            }
+
+            const data = await response.json();
+            return data;
         } catch (error) {
-            console.log(error)
+            console.error(error);
             throw error;
         }
     }
@@ -39,9 +52,6 @@ export class ServicesService {
             throw error;
         }
     }
-
-
-
 
     async save(id: string, body:ICreateVacancy) {
         try {

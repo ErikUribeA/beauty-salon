@@ -31,7 +31,7 @@ export class HttpClient {
         }
         return await response.json();
     }
-
+    
     async get<T>(url: string): Promise<T> {
         const headers = await this.getHeader();
         const response = await fetch(`${this.baseUrl}/${url}`, {

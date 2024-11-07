@@ -41,8 +41,6 @@ export const PostServiceForm = () => {
         try {
             await useService.create(data);
             alert("Servicio agregado correctamente");
-            
-        
         } catch (error) {
             console.log(error);
         }
