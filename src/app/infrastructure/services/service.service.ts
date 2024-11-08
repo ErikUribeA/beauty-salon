@@ -41,25 +41,47 @@ export class ServicesService {
         }
     }
 
-    /*
-    async destroy(id: string) {
+    
+    async destroy(id: number) {
         try {
-            const coders = this.httpClient.delete<IVacant[]>(`Coders/${id}`)
+            const response = await fetch(`/api/services/destroy/services/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
 
-            return coders
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error);
+            }
+
         } catch (error) {
-            console.log(error)
+            console.error(error);
             throw error;
         }
     }
 
-    async save(id: string, body:ICreateVacancy) {
+    async save(service: IPostService, id: number) {
         try {
-            const actualizarCoder = await this.httpClient.put(`vacants/${id}`, body);
-            return actualizarCoder;
+            const response = await fetch(`/api/services/save/services/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(service),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error);
+            }
+
+            const data = await response.json();
+            return data;
         } catch (error) {
-            console.log(error);
+            console.error(error);
             throw error;
         }
-    } */
+    }
 }

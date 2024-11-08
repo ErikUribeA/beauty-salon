@@ -1,11 +1,11 @@
-import { IResponseService } from "@/app/core/application/dto";
+import { IPostService, IResponseService } from "@/app/core/application/dto";
 import { Edit, Scissors, Trash2 } from "lucide-react";
 import Button from '@mui/joy/Button';
 
 interface CardProps {
     data: IResponseService;
-    onEdit: () => void;
-    onDelete: () => void;
+    onEdit: (data: IPostService, id: number,) => void;
+    onDelete: (id: number) => void;
 }
 
 const CardS: React.FC<CardProps> = ({ data, onEdit, onDelete }) => (
@@ -22,7 +22,7 @@ const CardS: React.FC<CardProps> = ({ data, onEdit, onDelete }) => (
                 color="primary"
                 disabled={false}
                 loading={false}
-                onClick={onEdit}
+                onClick={() => onEdit(data, data.id,)}
                 size="md"
                 variant="outlined"
             >
@@ -33,12 +33,12 @@ const CardS: React.FC<CardProps> = ({ data, onEdit, onDelete }) => (
                 color="danger"
                 disabled={false}
                 loading={false}
-                onClick={onDelete}
+                onClick={() => onDelete(data.id)}
                 size="md"
                 variant="outlined"
             >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Edit
+                Delete
             </Button>
         </div>
     </div>

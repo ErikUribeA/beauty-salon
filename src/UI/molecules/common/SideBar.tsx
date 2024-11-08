@@ -7,8 +7,8 @@ import { GrUserWorker } from "react-icons/gr";
 import { RiUserReceived2Line } from "react-icons/ri";
 
 
-
 import Image from 'next/image'
+import { signOut } from 'next-auth/react';
 
 const navItems = [
     { name: 'Services', href: '/dashboard/services', icon: Scissors },
@@ -20,6 +20,10 @@ const navItems = [
 
 export default function Sidebar() {
     const [isNavOpen, setIsNavOpen] = React.useState(false)
+
+    const handleLogout = () => {
+        signOut() // Esto cierra la sesión
+    }
 
     return (
         <nav
@@ -44,7 +48,7 @@ export default function Sidebar() {
                 ))}
             </ul>
 
-            <button className='flex'>
+            <button onClick={handleLogout} className='flex '>
                 <RiUserReceived2Line  className='w-5 h-5 mr-3'/>
                 Logout
             </button>

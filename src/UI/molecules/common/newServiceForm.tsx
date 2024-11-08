@@ -5,9 +5,7 @@ import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import { IPostService } from "@/app/core/application/dto"
-import { ServicesService } from "@/app/infrastructure/services/service.service"
 import { IoIosCloseCircleOutline } from "react-icons/io"
-import { toast } from "react-toastify"
 import Button from "@mui/joy/Button"
 import Input from '@mui/joy/Input'
 import Textarea from '@mui/joy/Textarea'
@@ -27,11 +25,12 @@ const postServiceSchema = yup.object().shape({
 interface PostServiceModalProps {
     isOpen: boolean
     onClose: () => void
+    onSubmit: (data: IPostService) => void
+    initialData?: IPostService | null // Añadimos la prop para los datos iniciales
 }
 
-export const PostServiceModal: React.FC<PostServiceModalProps> = ({ isOpen, onClose }) => {
+export const PostServiceModal: React.FC<PostServiceModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
     const [isLoading, setIsLoading] = useState(false)
-    const useService = new ServicesService()
 
     const {
         control,
@@ -43,16 +42,21 @@ export const PostServiceModal: React.FC<PostServiceModalProps> = ({ isOpen, onCl
         resolver: yupResolver(postServiceSchema),
     })
 
+    // Si hay datos iniciales, reseteamos el formulario con esos valores
+    React.useEffect(() => {
+        if (initialData) {
+            reset(initialData);
+        }
+    }, [initialData, reset]);
+
     const handlePostService = async (data: IPostService) => {
         setIsLoading(true)
         try {
-            await useService.create(data)
-            toast.success("The service was add without any error")
-            reset()
+            await onSubmit(data) // Usamos la función onSubmit que se pasa como prop
+            reset() // Limpia el formulario después de enviar
             onClose()
         } catch (error) {
             console.error(error)
-            toast.error("An error occurred while adding the service")
         } finally {
             setIsLoading(false)
         }
@@ -64,7 +68,7 @@ export const PostServiceModal: React.FC<PostServiceModalProps> = ({ isOpen, onCl
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
                 <div className="flex justify-between items-center p-6 border-b border-blue-300">
-                    <h2 className="text-2xl font-semibold text-gray-800">Add Service</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800">{initialData ? "Edit Service" : "Add Service"}</h2>
                     <Button
                         color="danger"
                         variant="outlined"
@@ -151,7 +155,7 @@ export const PostServiceModal: React.FC<PostServiceModalProps> = ({ isOpen, onCl
                             : "bg-blue-500 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                             } transition-colors`}
                     >
-                        {isLoading ? "Adding..." : "Add Service"}
+                        {isLoading ? "Saving..." : initialData ? "Save Changes" : "Add Service"}
                     </Button>
                 </form>
             </div>

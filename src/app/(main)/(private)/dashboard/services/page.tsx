@@ -1,6 +1,6 @@
 import React from 'react'
 import { ServicesService } from '@/app/infrastructure/services/service.service'
-import ContainerS from '@/UI/organims/ContainerServices'
+import TemplateService from '@/UI/template/templateService'
 
 const useServicesService = new ServicesService()
 
@@ -27,9 +27,6 @@ export default async function ServicesPage({ searchParams }: IProps) {
     const data = await useServicesService.findAll(page, size)
 
     return (
-        <div className='w-full'>
-            <h1 className='font-bold text-[3em] text-center'>Services</h1>
-            <ContainerS data={data} />
-        </div>
+        <TemplateService data={data} title='Services' />
     )
 }
