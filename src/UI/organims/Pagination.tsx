@@ -7,6 +7,7 @@ import { StepBack, StepForward } from "lucide-react";
 interface IProps {
     data: IServices;
 }
+
 function Pagination({ data }: IProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -17,15 +18,33 @@ function Pagination({ data }: IProps) {
 
         router.push(`?${params.toString()}`);
     };
+
     const currentPage = data.pageable.pageNumber + 1;
+
+
+    const buttonStyles = "text-blue-500 hover:text-blue-600 focus:outline-none transition-colors";
+    const disabledButtonStyles = "text-gray-400 hover:text-gray-400 cursor-not-allowed";
+
     return (
         <div className="flex justify-center items-center mt-5 gap-3">
-            <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}> <StepBack className="text-blue-500"/> </button>
+            <button 
+                onClick={() => onPageChange(currentPage - 1)} 
+                disabled={currentPage === 1}
+                className={`${buttonStyles} ${currentPage === 1 && disabledButtonStyles}`}
+            >
+                <StepBack />
+            </button>
             <span>Page</span>
             <span> {currentPage}</span>
             <span>  of  </span>
             <span> {data.totalPages}</span>
-            <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === data.totalPages}> <StepForward className="text-blue-500" /> </button>
+            <button 
+                onClick={() => onPageChange(currentPage + 1)} 
+                disabled={currentPage === data.totalPages}
+                className={`${buttonStyles} ${currentPage === data.totalPages && disabledButtonStyles}`}
+            >
+                <StepForward />
+            </button>
         </div>
     );
 }

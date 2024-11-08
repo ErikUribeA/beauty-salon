@@ -1,8 +1,6 @@
 import React from 'react'
 import { ServicesService } from '@/app/infrastructure/services/service.service'
-import ContainerS from '@/UI/organims/Container'
-import { PostServiceForm } from '@/UI/organims/newServiceForm'
-
+import ContainerS from '@/UI/organims/ContainerServices'
 
 const useServicesService = new ServicesService()
 
@@ -32,7 +30,6 @@ export default async function ServicesPage({ searchParams }: IProps) {
         <div className='w-full'>
             <h1 className='font-bold text-[3em] text-center'>Services</h1>
             <ContainerS data={data} />
-            <PostServiceForm />
         </div>
     )
 }
