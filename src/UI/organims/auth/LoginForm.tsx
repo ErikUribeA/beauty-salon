@@ -53,6 +53,7 @@ export const LoginForm = () => {
                 return;
             }
             router.push("/dashboard/services")
+            router.refresh()
         } catch (error) {
             console.log(error);
         }
