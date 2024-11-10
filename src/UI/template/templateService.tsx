@@ -5,28 +5,50 @@ import { IPostService, IServices } from '@/app/core/application/dto'
 import { toast } from 'react-toastify'
 import { ServicesService } from '@/app/infrastructure/services/service.service'
 import { useRouter } from 'next/navigation'
+import { useStore } from '@/store/store'
+import { IClients, IPostClient } from '@/app/core/application/dto/clients/clients-response.dto'
+import { ClientsService } from '@/app/infrastructure/services/client.service'
 
 export interface Data {
-    data: IServices,
+    data: IServices | IClients,
     title: string
 }
 
+// Type guard para verificar si es un IPostService
+function isPostService(data: IPostService | IPostClient): data is IPostService {
+    return 'name' in data && 'description' in data && 'price' in data;
+}
+
 const TemplateService: React.FC<Data> = ({ data, title }) => {
-    const useService = new ServicesService()
+    const { itemType } = useStore()
+    const serviceInstance = itemType === 'service' ? new ServicesService() : new ClientsService()
+    
     const [, setIsLoading] = useState(false)
-    const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar el modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    
     const router = useRouter()
 
-    const handlePostService = async (serviceData: IPostService) => {
+    const handlePostService = async (formData: IPostService | IPostClient) => {
         setIsLoading(true)
         try {
-            await useService.create(serviceData)
-            toast.success("The service was added successfully")
-            setIsModalOpen(false); // Cierra el modal después de agregar el servicio
-            router.refresh() // Recarga los datos desde el servidor
+            if (itemType === 'service') {
+                if (!isPostService(formData)) {
+                    throw new Error('Invalid service data');
+                }
+                await (serviceInstance as ServicesService).create(formData);
+            } else {
+                if (isPostService(formData)) {
+                    throw new Error('Invalid client data');
+                }
+                await (serviceInstance as ClientsService).create(formData);
+            }
+            
+            toast.success(`${itemType === 'service' ? 'The service was created successfully' : 'The Client was created successfully'}`)
+            setIsModalOpen(false);
+            router.refresh()
         } catch (error) {
             console.error(error)
-            toast.error("An error occurred while adding the service")
+            toast.error("An error occurred while adding the item")
         } finally {
             setIsLoading(false)
         }
@@ -35,27 +57,38 @@ const TemplateService: React.FC<Data> = ({ data, title }) => {
     const handleDelete = async (id: number) => {
         setIsLoading(true)
         try {
-            await useService.destroy(id)
-            toast.success("The service was successfully deleted")
-            router.refresh() // Recarga los datos desde el servidor
+            await serviceInstance.destroy(id)
+            toast.success(`${itemType === 'service' ? 'The service was deleted successfully' : 'The Client was deleted successfully'}`)
+            router.refresh()
         } catch (error) {
             console.error(error)
-            toast.error("An error occurred while deleting the service")
+            toast.error("An error occurred while deleting the item")
         } finally {
             setIsLoading(false)
         }
     }
 
-    const handleEdit = async (serviceData: IPostService, id: number) => {
+    const handleEdit = async (formData: IPostService | IPostClient, id: number) => {
         setIsLoading(true)
         try {
-            await useService.save(serviceData, id)
-            toast.success("The service was added successfully")
-            setIsModalOpen(false); 
-            router.refresh() 
+            if (itemType === 'service') {
+                if (!isPostService(formData)) {
+                    throw new Error('Invalid service data');
+                }
+                await (serviceInstance as ServicesService).save(formData, id);
+            } else {
+                if (isPostService(formData)) {
+                    throw new Error('Invalid client data');
+                }
+                await (serviceInstance as ClientsService).save(formData, id);
+            }
+            
+            toast.success(`${itemType === 'service' ? 'The service was updated successfully' : 'The Client was updated successfully'}`)
+            setIsModalOpen(false);
+            router.refresh()
         } catch (error) {
             console.error(error)
-            toast.error("An error occurred while adding the service")
+            toast.error("An error occurred while updating the item")
         } finally {
             setIsLoading(false)
         }
@@ -72,7 +105,6 @@ const TemplateService: React.FC<Data> = ({ data, title }) => {
                 setIsModalOpen={setIsModalOpen}
                 onEdit={handleEdit}
             />
-
         </div>
     )
 }

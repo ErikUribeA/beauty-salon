@@ -1,4 +1,5 @@
 "use client"
+import Preloader from '@/UI/atoms/preloader'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
@@ -23,7 +24,7 @@ export default function AuthGuard(
     }
     if (status === "loading") {
         return (
-            <h1>Cargando ...</h1>
+            <Preloader />
         )
     }
 }

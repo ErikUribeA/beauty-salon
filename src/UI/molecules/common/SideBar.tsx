@@ -1,40 +1,44 @@
-'use client'
+'use client';
 
-import React from 'react'
-import Link from 'next/link'
-import { Scissors, Calendar, User, ChevronRight } from 'lucide-react'
+import React, { useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Scissors, Calendar, User, ChevronRight } from 'lucide-react';
 import { GrUserWorker } from "react-icons/gr";
 import { RiUserReceived2Line } from "react-icons/ri";
-
-
-import Image from 'next/image'
+import Image from 'next/image';
 import { signOut } from 'next-auth/react';
+import { useStore } from '@/store/store'; 
 
 const navItems = [
     { name: 'Services', href: '/dashboard/services', icon: Scissors },
     { name: 'Appointments', href: '/dashboard/appointment', icon: Calendar },
     { name: 'Employees', href: '/dashboard/employee', icon: GrUserWorker },
-    { name: 'Client', href: '/dashboard/client', icon: User },
-
-]
+    { name: 'Clients', href: '/dashboard/clients', icon: User },
+];
 
 export default function Sidebar() {
-    const [isNavOpen, setIsNavOpen] = React.useState(false)
+    const [isNavOpen, setIsNavOpen] = React.useState(false);
+    const pathname = usePathname();
+    const setItemTypeByPath = useStore((state) => state.setItemTypeByPath);
+
+    useEffect(() => {
+        setItemTypeByPath(pathname);
+    }, [pathname, setItemTypeByPath]);
 
     const handleLogout = () => {
-        signOut() // Esto cierra la sesión
-    }
+        signOut();
+    };
 
     return (
         <nav
             className={`fixed lg:static inset-y-0 left-0 transform ${isNavOpen ? 'translate-x-0' : '-translate-x-full'
                 } lg:translate-x-0 transition duration-200 ease-in-out z-30 bg-blue-300 text-gray-800 w-64 p-4 flex flex-col`}
         >
-            <div className="mb-8 ">
-                <h1 className="flex flex-col items-center  text-3xl font-bold text-center">
+            <div className="mb-8">
+                <h1 className="flex flex-col items-center text-3xl font-bold text-center">
                     Barber Shop
-                    <Image src="/images/hair-salon (1).png" width={100} height={100} alt='holy cow' />
-
+                    <Image src="/images/hair-salon (1).png" width={100} height={100} alt="holy cow" />
                 </h1>
             </div>
             <ul className="space-y-2 flex-grow">
@@ -47,9 +51,8 @@ export default function Sidebar() {
                     </li>
                 ))}
             </ul>
-
-            <button onClick={handleLogout} className='flex '>
-                <RiUserReceived2Line  className='w-5 h-5 mr-3'/>
+            <button onClick={handleLogout} className="flex">
+                <RiUserReceived2Line className="w-5 h-5 mr-3" />
                 Logout
             </button>
             <button
@@ -59,5 +62,5 @@ export default function Sidebar() {
                 <ChevronRight className={`transform transition-transform ${isNavOpen ? 'rotate-180' : ''}`} />
             </button>
         </nav>
-    )
+    );
 }

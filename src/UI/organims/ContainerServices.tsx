@@ -1,53 +1,69 @@
 'use client'
 import { IPostService, IServices } from "@/app/core/application/dto";
-import CardS from "../molecules/common/CardS";
+import CardS from "../molecules/common/Card/CardS";
 import Pagination from "../molecules/common/Pagination";
 import { useState } from "react";
-import { PostServiceModal } from "../molecules/common/newServiceForm";
+import { PostServiceModal } from "../molecules/form/newServiceForm";
+import { PostClientModal } from "../molecules/form/newClientForm"; // Importa el modal para los clientes
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Button from '@mui/joy/Button';
+import { useStore } from '@/store/store'; // Ajusta la ruta de importación según sea necesario
+import { IClients, IPostClient } from "@/app/core/application/dto/clients/clients-response.dto";
 
-interface IResponse {
-    data: IServices;
-    onEdit: (data: IPostService, id: number) => void;
+interface IResponse<T> {
+    data: T;
+    onEdit: (data: IPostService | IPostClient, id: number) => void;
     onDelete: (id: number) => void;
-    onSubmit: (data: IPostService) => Promise<void>;
+    onSubmit: (data: IPostService | IPostClient) => Promise<void>;
     isModalOpen: boolean;
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ContainerS: React.FC<IResponse> = ({ data, onEdit, onDelete, onSubmit, isModalOpen, setIsModalOpen }) => {
+const ContainerS: React.FC<IResponse<IServices | IClients>> = ({ data, onEdit, onDelete, onSubmit, isModalOpen, setIsModalOpen }) => {
     const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
     const [selectedId, setSelectedId] = useState<number | null>(null);
-    const [selectedService, setSelectedService] = useState<IPostService | null>(null); // Para almacenar el servicio seleccionado
+    const [selectedService, setSelectedService] = useState<IPostService | IPostClient | null>(null);
+
+    // Obtener el tipo de item (client o service) desde el estado global de Zustand
+    const itemType = useStore((state) => state.itemType);
 
     const handleOpenModal = (mode: 'add' | 'edit', id?: number) => {
         setModalMode(mode);
         if (id) {
-            const service = data.content.find(item => item.id === id); // Busca el servicio con ese id
+            const service = data.content.find((item) => item.id === id);
             if (service) {
-                setSelectedService(service); // Almacena el servicio seleccionado
+                setSelectedService(service);
             }
             setSelectedId(id);
         } else {
-            setSelectedService(null); // Si es el modo 'add', no hay servicio seleccionado
+            setSelectedService(null);
         }
-        setIsModalOpen(true); // Abre el modal
+        setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
-        setIsModalOpen(false); // Cierra el modal
+        setIsModalOpen(false);
         setSelectedId(null);
-        setSelectedService(null); // Limpia el servicio seleccionado
+        setSelectedService(null);
     };
 
-    const handleSubmit = (data: IPostService) => {
+    const handleSubmit = async (data: IPostService | IPostClient) => {
         if (modalMode === 'add') {
-            onSubmit(data); // Llama a onSubmit cuando se agrega el servicio
+            // Llama a onSubmit con el tipo correcto
+            if (itemType === 'service') {
+                await onSubmit(data as IPostService);
+            } else {
+                await onSubmit(data as IPostClient);
+            }
         } else if (modalMode === 'edit' && selectedId !== null) {
-            onEdit(data, selectedId); // Llama a onEdit cuando se edita un servicio
+            if (itemType === 'service') {
+                onEdit(data as IPostService, selectedId);
+            } else {
+                onEdit(data as IPostClient, selectedId);
+            }
         }
-    }
+    };
+    
 
     return (
         <div className="flex flex-col m-5">
@@ -59,20 +75,34 @@ const ContainerS: React.FC<IResponse> = ({ data, onEdit, onDelete, onSubmit, isM
                     variant="outlined"
                 >
                     <IoIosAddCircleOutline className="text-[1.4em] mr-2" />
-                    Add Service
+                    Add {itemType === 'service' ? 'Service' : 'Client'}
                 </Button>
 
-                {/* Modal para agregar/editar servicio */}
-                <PostServiceModal 
-                    isOpen={isModalOpen} 
-                    onClose={handleCloseModal} 
-                    onSubmit={handleSubmit} 
-                    initialData={selectedService} // Pasamos el servicio seleccionado si existe
-                />
+                {/* Renderiza el modal correcto según el tipo de elemento */}
+                {itemType === 'service' ? (
+                    <PostServiceModal
+                        isOpen={isModalOpen}
+                        onClose={handleCloseModal}
+                        onSubmit={handleSubmit}
+                        initialData={selectedService as IPostService}
+                    />
+                ) : (
+                    <PostClientModal
+                        isOpen={isModalOpen}
+                        onClose={handleCloseModal}
+                        onSubmit={handleSubmit}
+                        initialData={selectedService as IPostClient}
+                    />
+                )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data.content.map((item) => (
-                    <CardS key={item.id} data={item} onEdit={() => handleOpenModal('edit', item.id)}  onDelete={onDelete} />
+                    <CardS
+                        key={item.id}
+                        data={item}
+                        onEdit={() => handleOpenModal('edit', item.id)}
+                        onDelete={onDelete}
+                    />
                 ))}
             </div>
 
@@ -80,6 +110,5 @@ const ContainerS: React.FC<IResponse> = ({ data, onEdit, onDelete, onSubmit, isM
         </div>
     );
 };
-
 
 export default ContainerS;
