@@ -20,7 +20,6 @@ export interface CustomSession extends Session {
         id?: string;
         token?: string;
         name?: string | null;
-
         email?: string | null;
         image?: string | null;
     };

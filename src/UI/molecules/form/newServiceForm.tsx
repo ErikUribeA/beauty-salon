@@ -20,7 +20,7 @@ const postServiceSchema = yup.object().shape({
         .number()
         .positive("The price must be a positive number")
         .required("The price is required"),
-})
+}) 
 
 interface PostServiceModalProps {
     isOpen: boolean

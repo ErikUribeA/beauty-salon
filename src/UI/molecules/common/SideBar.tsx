@@ -37,7 +37,7 @@ export default function Sidebar() {
         >
             <div className="mb-8">
                 <h1 className="flex flex-col items-center text-3xl font-bold text-center">
-                    Barber Shop
+                    Beauty salon
                     <Image src="/images/hair-salon (1).png" width={100} height={100} alt="holy cow" />
                 </h1>
             </div>
